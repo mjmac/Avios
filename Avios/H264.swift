@@ -64,13 +64,13 @@ open class H264Decoder {
         pthread_mutex_init(&mutex, nil)
         pthread_cond_init(&cond, nil)
         bufsize = 1024 * 16
-        buffer = UnsafeMutablePointer<UInt8>(malloc(bufsize))
+        buffer = UnsafeMutablePointer<UInt8>.allocate(capacity:bufsize)
     }
     deinit{
         invalidateVideo()
         pthread_cond_destroy(&cond)
         pthread_mutex_destroy(&mutex)
-        free(buffer)
+        buffer?.deallocate(capacity: bufsize)
     }
     
     open func decode(_ data: UnsafePointer<UInt8>, length: Int) throws -> AviosImage {
@@ -177,8 +177,8 @@ open class H264Decoder {
             while image.stride * image.height > bufsize {
                 bufsize *= 2
             }
-            free(buffer)
-            buffer = UnsafeMutablePointer<UInt8>(malloc(bufsize))
+            buffer?.deallocate(capacity: bufsize)
+            buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufsize)
         }
         memcpy(buffer, CVPixelBufferGetBaseAddress(pixelBuffer), image.stride * image.height)
         image.rgba = UnsafeBufferPointer<UInt8>(start: buffer, count: image.stride * image.height)
@@ -216,7 +216,7 @@ open class H264Decoder {
         destinationPixelBufferAttributes.setValue(NSNumber(value: kCVPixelFormatType_32BGRA as UInt32), forKey: kCVPixelBufferPixelFormatTypeKey as String)
 
         var outputCallback = VTDecompressionOutputCallbackRecord()
-        outputCallback.decompressionOutputCallback = callback as! VTDecompressionOutputCallback
+        outputCallback.decompressionOutputCallback = callback as? VTDecompressionOutputCallback
         outputCallback.decompressionOutputRefCon = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
        
         status = VTDecompressionSessionCreate(nil, formatDescription, decoderParameters, destinationPixelBufferAttributes, &outputCallback, &videoSessionM)

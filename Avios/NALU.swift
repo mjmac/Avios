@@ -85,7 +85,7 @@ open class NALU {
         return type.description
     }
     open func copy() -> NALU {
-        let baseAddress = UnsafeMutablePointer<UInt8>(malloc(buffer.count))
+        let baseAddress = UnsafeMutablePointer<UInt8>.allocate(capacity: buffer.count)
         memcpy(baseAddress, buffer.baseAddress, buffer.count)
         let nalu = NALU(baseAddress, length: buffer.count)
         nalu.copied = true
@@ -98,8 +98,7 @@ open class NALU {
         return memcmp(nalu.buffer.baseAddress, buffer.baseAddress, buffer.count) == 0
     }
     open var nsdata : Data {
-        return Data(bytesNoCopy: UnsafeMutablePointer<UInt8>(UnsafeMutableRawPointer(buffer.baseAddress)), count: buffer.count, deallocator: .none)
-    }
+        return Data(bytesNoCopy: UnsafeMutableRawPointer(mutating: buffer.baseAddress!) , count: buffer.count, deallocator: .none)    }
     
     // returns a non-contiguous CMBlockBuffer.
     open func blockBuffer() throws -> CMBlockBuffer {

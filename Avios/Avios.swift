@@ -8,16 +8,16 @@
 
 import Foundation
 
-public class AviosImage {
-    public var width: Int = 0
-    public var height: Int = 0
-    public var stride: Int = 0
-    public var yStride: Int = 0
-    public var uvStride: Int = 0
-    public var rgba : UnsafeBufferPointer<UInt8>
-    public var y : UnsafeBufferPointer<UInt8>
-    public var u : UnsafeBufferPointer<UInt8>
-    public var v : UnsafeBufferPointer<UInt8>
+open class AviosImage {
+    open var width: Int = 0
+    open var height: Int = 0
+    open var stride: Int = 0
+    open var yStride: Int = 0
+    open var uvStride: Int = 0
+    open var rgba : UnsafeBufferPointer<UInt8>
+    open var y : UnsafeBufferPointer<UInt8>
+    open var u : UnsafeBufferPointer<UInt8>
+    open var v : UnsafeBufferPointer<UInt8>
     internal init() {
         rgba = UnsafeBufferPointer<UInt8>(start: UnsafePointer<UInt8>(bitPattern: 0), count: 0)
         y = UnsafeBufferPointer<UInt8>(start: UnsafePointer<UInt8>(bitPattern: 0), count: 0)
@@ -26,6 +26,6 @@ public class AviosImage {
     }
 }
 
-public enum AviosError : ErrorType {
-    case NoImage
+public enum AviosError : Error {
+    case noImage
 }
